@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<meta charset = "utf-8">
+    
+    <style>
+    .liquidFillGaugeText { font-family: Helvetica; font-weight: bold; }
+    
+    body {
+        font-family: "Helvetica Neue",
+        Helvetica, Arial, sans-serif;
+        background-color:rgb(243,243,243)} 
+
+    //div { background-color:DarkGray }
+
+    .box {
+        font: 10px sans-serif;
+    }
+    .box line,
+    .box rect,
+    .box circle {
+        fill: #fff;
+        stroke: #000;
+        stroke-width: 1.5px;
+    }
+    .box .center {
+        stroke-dasharray: 3,3;
+    }
+
+    .box .warning { 
+        stroke-dasharray: 3,3;
+        stroke: orange;
+    }
+
+    .box .alarm { 
+        stroke-dasharray: 3,3;
+        stroke: red;
+    }
+    .box .outlier {
+        fill: none;
+        stroke: #ccc;
+    }
+
+    .arc {
+    stroke-weight:0.1;
+    fill: #4e8fff;
+    }
+
+    </style>
+    
+    <body>
+       <div id = "modeButtons" style='float:right'><p>Maintenance</p></div>
+      <h1> Battery Management System </h1>
+      <div id = "overview" ><p>Overview</p></div>
+      <div id = "scatterVoltages" ><p>Voltage Bar Graph</p></div>
+      <div id = "scatterTemps" ><p>Temperature Bar Graph</p></div>
+      <div style='float:right'>
+        <p>Debugging Tools</p>
+        <form>
+          <input type = "radio" name = "modeRadio" value = "On" onclick = "modeSwitch(0)" checked>Mode On<br>
+          <input type = "radio" name = "modeRadio" value = "Off" onclick = "modeSwitch(1)">Mode Off<br>
+          <input type = "radio" name = "modeRadio" value = "Charge" onclick = "modeSwitch(2)">Mode Charge<br>
+          <input type = "radio" name = "modeRadio" value = "Balance" onclick = "modeSwitch(3)">Mode Balance
+        </form> 
+        <button onclick = "myFunction()">animate boxplots</button>
+        <button onclick = "mySOCFunction()">animate SOC</button>
+      </div>
+
+
+
+       <script src = "config.js" language = "JavaScript"></script>
+       <script src = "d3.min.js" language = "JavaScript"></script>
+       <script src = "modeButtons.js" language = "JavaScript"></script>
+       <script src = "batteryIcon.js" language = "JavaScript"></script>
+       <script src = "ampIcon.js"></script>
+       <script src = "barPlot.js"></script>
+       <script src = "infoBox.js"></script>
+
+       <script>
+               
+        // Returns a function to compute the whisker locations(innerquartile range)
+        // observations outside of this range are outliers
+        
+        function myFunction() {
+           // var svg = d3.select(boxPlotContainer).selectAll("svg").selectAll("g.voltage").datum(randomize).call(chart.duration(300));
+           voltScatter();
+        } 
+
+        function randomize(d) {
+            return d.map( function(arg) {return (Math.max(2.5, Math.min(4.5, arg + .1*(Math.random() - .5)))); });
+        }
+
+        function mySOCFunction() {
+            batteryGauge.Update((Math.random()*100).toFixed(2));
+            updateAmps(overviewContainer);
+        } 
+
+        function getRandomColor() {
+          var letters = '0123456789ABCDEF'.split('');
+          var color = '#';
+          for (var i = 0; i < 6; i++ ) {
+            color += letters[Math.floor(Math.random() * 16)];
+          }
+          return color;
+        }
+        
+        loadModeButtons();
+        var batteryIcon = d3.batteryIcon().gsWidth(48).loadBatteryIcon();
+        setInterval(function() {
+        batteryIcon();
+        }, 2000);
+
+        var ampIcon = d3.ampIcon().loadAmpIcon();
+        setInterval(function() {
+        ampIcon();
+        }, 5000);
+
+        var voltScatter = d3.barPlot().gsParent("#scatterVoltages").gsWidth(600).gsHeight(100).loadBarPlot();
+        setInterval(function() {
+        voltScatter();
+        }, 2000);
+
+        var tempScatter = d3.barPlot().gsParent("#scatterTemps").gsWidth(600).gsHeight(100).loadBarPlot();
+        setInterval(function() {
+        tempScatter();
+        }, 2000);
+
+        var genInfo = d3.infoBox().loadBoxInfo();
+        setInterval(function() {
+        genInfo();
+        }, 2000);
+
+    </script>
+  </body>
+</html>        
